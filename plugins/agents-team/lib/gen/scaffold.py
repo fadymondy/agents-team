@@ -189,11 +189,29 @@ def _render_archetype(kind: str, archetype: str, values: dict, team_spec: dict) 
     return render(template, merged, tolerant=True)
 
 
-def self_eval(manifest: dict) -> int:
+# Grade ordering (lower index = better). The min-grade gate fails when any
+# produced agent's grade index exceeds the floor's index.
+_GRADE_ORDER = {"A": 0, "B": 1, "C": 2, "D": 3, "F": 4}
+EXIT_GRADE_FLOOR_VIOLATED = 3
+
+
+def self_eval(manifest: dict, min_grade: str = "B") -> int:
     """Run the static linter on every produced agent + skill. Returns the
-    worst exit code observed (0 ship / 1 revise / 2 reject)."""
+    worst exit code observed:
+      0 = all ship + all at-or-above the min-grade floor
+      1 = at least one revise verdict from the linter
+      2 = at least one reject verdict from the linter
+      3 = grades above floor exist but no revise/reject verdicts
+    Min-grade always wins over verdict — i.e., a `ship` with a `C` grade
+    when floor is `B` returns 3.
+    """
+    if min_grade not in _GRADE_ORDER:
+        raise ValueError(f"min_grade must be one of {list(_GRADE_ORDER)}")
+    floor = _GRADE_ORDER[min_grade]
     lint_py = PLUGIN_ROOT / "lib" / "eval" / "lint.py"
     worst = 0
+    grade_violations: list[tuple[str, str]] = []
+
     print("\n=== Self-evaluation ===")
     for path in manifest["agents"] + manifest["skills"]:
         try:
@@ -206,12 +224,22 @@ def self_eval(manifest: dict) -> int:
             try:
                 report = json.loads(r.stdout)
                 ov = report["overall"]
-                print(f"  {os.path.basename(path):40s} {ov['grade']}  {ov['score']:3d}/100  {ov['verdict']}")
+                grade = ov["grade"]
+                if _GRADE_ORDER[grade] > floor:
+                    grade_violations.append((path, grade))
+                marker = "" if _GRADE_ORDER[grade] <= floor else "  <-- below floor"
+                print(f"  {os.path.basename(path):40s} {grade}  {ov['score']:3d}/100  {ov['verdict']}{marker}")
             except (json.JSONDecodeError, KeyError):
                 print(f"  {os.path.basename(path):40s} ! could not parse lint output")
         except OSError as e:
             print(f"  {os.path.basename(path)}: lint failed: {e}")
-    print(f"=== Self-eval worst verdict: exit {worst} ===")
+
+    if grade_violations and worst < EXIT_GRADE_FLOOR_VIOLATED:
+        worst = EXIT_GRADE_FLOOR_VIOLATED
+        names = ", ".join(f"{os.path.basename(p)} ({g})" for p, g in grade_violations)
+        print(f"\n!! Min-grade gate ({min_grade}) violated by: {names}")
+
+    print(f"=== Self-eval worst verdict: exit {worst} (min-grade={min_grade}) ===")
     return worst
 
 
@@ -221,8 +249,24 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--target", required=True, help="Project root (where .claude/ will live)")
     p.add_argument("--dry-run", action="store_true", help="Print actions without writing")
     p.add_argument("--no-self-eval", action="store_true",
-                   help="Skip running the static linter on produced files")
+                   help="Skip the static linter on produced files. "
+                        "Requires AGENTS_TEAM_DEV=1 in the environment — the gate "
+                        "exists to catch the mistakes you'll make at 2am, do not "
+                        "skip it for production runs.")
+    p.add_argument("--min-grade", choices=tuple(_GRADE_ORDER), default="B",
+                   help="Lowest acceptable grade per produced agent (default: B). "
+                        "Any agent below this floor exits with code 3 even if no "
+                        "agent triggered a revise/reject verdict.")
     args = p.parse_args(argv)
+
+    if args.no_self_eval and os.environ.get("AGENTS_TEAM_DEV") != "1":
+        print(
+            "scaffold.py: --no-self-eval requires AGENTS_TEAM_DEV=1 "
+            "(development mode). Self-eval is the gate; do not skip it for "
+            "production runs.",
+            file=sys.stderr,
+        )
+        return 64
 
     if not os.path.isfile(args.team):
         print(f"scaffold.py: team spec not found: {args.team}", file=sys.stderr)
@@ -242,7 +286,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run or args.no_self_eval:
         return 0
-    return self_eval(manifest)
+    return self_eval(manifest, min_grade=args.min_grade)
 
 
 if __name__ == "__main__":

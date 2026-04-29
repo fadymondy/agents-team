@@ -125,7 +125,21 @@ This:
 - Merges `settings.json.partial` into `<target>/.claude/settings.json`.
 - Runs the static linter (`/evaluate-agent`) on every produced agent + skill — the **self-eval gate**.
 
-The exit code is the worst verdict observed: `0` ship, `1` revise, `2` reject.
+#### Gate flags
+
+- `--min-grade A|B|C|D|F` — lowest acceptable grade per produced agent. Default `B`. Any agent below the floor exits with code `3` even when no agent triggered a `revise`/`reject` verdict. Use `--min-grade A` for production teams.
+- `--no-self-eval` — skips the linter entirely. **Hard-gated**: requires `AGENTS_TEAM_DEV=1` in the environment, otherwise exits `64`. The gate exists to catch the mistakes you'll make at 2am; do not skip it for production runs.
+
+#### Exit codes
+
+| Code | Meaning                                                    |
+|------|------------------------------------------------------------|
+| `0`  | All produced agents `ship` and at-or-above the floor       |
+| `1`  | At least one `revise` verdict from the linter              |
+| `2`  | At least one `reject` verdict from the linter              |
+| `3`  | All `ship` but at least one agent below `--min-grade`      |
+| `64` | Bad CLI args (incl. `--no-self-eval` without `AGENTS_TEAM_DEV=1`) |
+| `66` | `team.json` or `--target` not found                        |
 
 ### 7. Read the self-eval report
 
