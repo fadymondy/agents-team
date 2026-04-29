@@ -1,0 +1,191 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Job 1 — lint every changed agent / skill / template against the
+  # static linter. Fails on revise or reject.
+  # -------------------------------------------------------------------------
+  lint-agents:
+    name: lint changed agents
+    runs-on: ubuntu-latest
+    outputs:
+      worst: ${{ steps.run.outputs.worst }}
+      summary: ${{ steps.run.outputs.summary }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Determine changed files
+        id: changed
+        shell: bash
+        run: |
+          set -e
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+          fi
+          # On the first push of a branch, `before` is the null SHA; fall back
+          # to comparing against the previous commit on this ref.
+          if [[ "$base" == "0000000000000000000000000000000000000000" || -z "$base" ]]; then
+            base="$(git rev-parse HEAD~1 2>/dev/null || echo "$head")"
+          fi
+          echo "Comparing $base...$head"
+          git diff --name-only "$base" "$head" -- \
+            '.claude/agents/*.md' \
+            '.claude/skills/**/SKILL.md' \
+            'plugins/agents-team/skills/**/SKILL.md' \
+            'plugins/agents-team/templates/agents/*.md.template' \
+            'plugins/agents-team/templates/skills/*.md.template' \
+            'plugins/agents-team/templates/fixtures/example-*.md' \
+            > /tmp/changed.txt || true
+          echo "files-count=$(wc -l < /tmp/changed.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          cat /tmp/changed.txt
+
+      - name: Lint changed files
+        id: run
+        shell: bash
+        run: |
+          set +e
+          worst=0
+          summary=""
+          while IFS= read -r f; do
+            [[ -z "$f" || ! -f "$f" ]] && continue
+            # Templates have unfilled {{tokens}} — lint with --tolerant flavor
+            # via the same script (the linter is forgiving on unknown tokens).
+            out=$(python3 plugins/agents-team/lib/eval/lint.py "$f")
+            rc=$?
+            grade=$(echo "$out" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['overall']['grade'])")
+            score=$(echo "$out" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['overall']['score'])")
+            verdict=$(echo "$out" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['overall']['verdict'])")
+            line="$f → $grade ($score/100) $verdict"
+            echo "$line"
+            summary="$summary"$'\n'"- $line"
+            (( rc > worst )) && worst=$rc
+          done < /tmp/changed.txt
+          echo "worst=$worst" >> "$GITHUB_OUTPUT"
+          {
+            echo "summary<<EOF"
+            echo "$summary"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          # Hard-fail on revise or reject
+          if (( worst > 0 )); then
+            echo "::error::Worst verdict was exit $worst (1=revise, 2=reject)"
+            exit "$worst"
+          fi
+
+  # -------------------------------------------------------------------------
+  # Job 2 — full pytest suite.
+  # -------------------------------------------------------------------------
+  pytest:
+    name: pytest
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run tests
+        run: pytest plugins/agents-team/tests/ -v
+
+  # -------------------------------------------------------------------------
+  # Job 3 — bash syntax check on every shell script.
+  # -------------------------------------------------------------------------
+  shell-syntax:
+    name: shell syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: bash -n every .sh
+        run: |
+          set -e
+          fail=0
+          while IFS= read -r f; do
+            if ! bash -n "$f"; then
+              echo "::error file=$f::bash syntax error"
+              fail=1
+            fi
+          done < <(find plugins/agents-team -name '*.sh' -type f)
+          exit "$fail"
+
+  # -------------------------------------------------------------------------
+  # Job 4 — smoke-test the generator end-to-end.
+  # -------------------------------------------------------------------------
+  generator-smoke:
+    name: generator smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Scaffold the example team
+        run: |
+          mkdir -p /tmp/ci-smoke
+          python3 plugins/agents-team/lib/gen/scaffold.py \
+            examples/example-team.json \
+            --target /tmp/ci-smoke \
+            --min-grade A
+      - name: Verify generated layout
+        run: |
+          test -f /tmp/ci-smoke/.claude/agents/shop-orch.md
+          test -f /tmp/ci-smoke/.claude/settings.json
+          ls /tmp/ci-smoke/.claude/agents | wc -l | grep -q 10
+          echo "Generated layout OK"
+
+  # -------------------------------------------------------------------------
+  # PR comment — summarize the lint job's per-file verdicts.
+  # -------------------------------------------------------------------------
+  comment:
+    name: post lint summary
+    runs-on: ubuntu-latest
+    needs: lint-agents
+    if: github.event_name == 'pull_request' && always()
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `${{ needs.lint-agents.outputs.summary }}`;
+            const worst = `${{ needs.lint-agents.outputs.worst }}`;
+            const verdict = ({"0":"ship","1":"revise","2":"reject"})[worst] || "unknown";
+            const body = [
+              "### agents-team lint summary",
+              "",
+              `Worst verdict: **${verdict}** (exit ${worst})`,
+              summary || "_no changed agent / skill / template files in this PR_",
+            ].join("\n");
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            await github.rest.issues.createComment({ owner, repo, issue_number, body });
