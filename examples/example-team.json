@@ -1,0 +1,175 @@
+{
+  "team_name": "e-Shop",
+  "services": ["api", "web", "payments", "mobile"],
+  "primary_locale": "en",
+  "orchestrator": {
+    "archetype": "orchestrator",
+    "values": {
+      "name": "shop-orch",
+      "description": "Orchestrator for the e-Shop team. Use proactively at the start of any feature, bug, or cross-service question. Routes to api-engineer, web-engineer, payments-engineer, mobile-engineer, qa-engineer, security-engineer, devops-engineer, or shop-watcher. MUST BE USED for tasks crossing 2+ services.",
+      "color": "#5B8DEF",
+      "display_name": "Shop Orchestrator",
+      "role_title": "Routing & Sequencing",
+      "specialists": "api-engineer, web-engineer, payments-engineer, mobile-engineer, qa-engineer, security-engineer, devops-engineer",
+      "delegations": "- API change → **api-engineer**\n- Web UI change → **web-engineer**\n- Stripe / payments / refunds → **payments-engineer**\n- Mobile app change → **mobile-engineer**\n- Tests / acceptance → **qa-engineer**\n- Auth / PCI / dependency CVEs → **security-engineer**\n- CI/CD / Cloud Run / Vercel → **devops-engineer**\n- Error-rate spikes / always-on watch → **shop-watcher**"
+    }
+  },
+  "agents": [
+    {
+      "archetype": "domain-engineer",
+      "values": {
+        "name": "api-engineer",
+        "description": "API engineer for the e-Shop team. Owns services/api/ — REST handlers, WebSocket, request validation, ORM models, OpenAPI spec. Use proactively after the orchestrator picks an API task.",
+        "color": "#22C55E",
+        "display_name": "API Engineer",
+        "domain": "API",
+        "owned_paths": "services/api/",
+        "primary_language": "TypeScript (Node 20)",
+        "test_framework": "Vitest + supertest",
+        "build_command": "pnpm --filter api build",
+        "lint_command": "pnpm --filter api lint"
+      }
+    },
+    {
+      "archetype": "domain-engineer",
+      "values": {
+        "name": "web-engineer",
+        "description": "Web engineer for the e-Shop team. Owns apps/web/ — storefront and seller dashboard, React components, routes, fetch hooks. Use proactively after the orchestrator picks a web task.",
+        "color": "#3B82F6",
+        "display_name": "Web Engineer",
+        "domain": "Web",
+        "owned_paths": "apps/web/",
+        "primary_language": "TypeScript (React 19, TanStack Router)",
+        "test_framework": "Vitest + Testing Library + Playwright",
+        "build_command": "pnpm --filter web build",
+        "lint_command": "pnpm --filter web lint"
+      }
+    },
+    {
+      "archetype": "domain-engineer",
+      "values": {
+        "name": "payments-engineer",
+        "description": "Payments engineer for the e-Shop team. Owns services/payments/ — Stripe webhooks, idempotency keys, refund flow, Connect Express onboarding. Use proactively for any change touching billing, checkout, or money movement.",
+        "color": "#A855F7",
+        "display_name": "Payments Engineer",
+        "domain": "Payments",
+        "owned_paths": "services/payments/",
+        "primary_language": "TypeScript (Node 20)",
+        "test_framework": "Vitest + Stripe CLI fixtures",
+        "build_command": "pnpm --filter payments build",
+        "lint_command": "pnpm --filter payments lint"
+      }
+    },
+    {
+      "archetype": "domain-engineer",
+      "values": {
+        "name": "mobile-engineer",
+        "description": "Mobile engineer for the e-Shop team. Owns apps/mobile/ — Flutter app for iOS + Android, order tracking, push notifications. Use proactively after the orchestrator picks a mobile task.",
+        "color": "#06B6D4",
+        "display_name": "Mobile Engineer",
+        "domain": "Mobile",
+        "owned_paths": "apps/mobile/",
+        "primary_language": "Dart / Flutter",
+        "test_framework": "flutter_test + integration_test",
+        "build_command": "flutter build ios && flutter build apk",
+        "lint_command": "flutter analyze"
+      }
+    },
+    {
+      "archetype": "designer",
+      "values": {
+        "name": "shop-designer",
+        "description": "Designer for the e-Shop team. Owns the storefront UX, seller-dashboard IA, copy, accessibility. Use proactively after the orchestrator picks a design task before any implementation by the web or mobile engineer.",
+        "color": "#EC4899",
+        "display_name": "Shop Designer",
+        "design_tokens_path": "design-tokens/",
+        "components_path": "apps/web/src/components/",
+        "frontend_engineer": "web-engineer",
+        "primary_locale": "en"
+      }
+    },
+    {
+      "archetype": "qa-engineer",
+      "values": {
+        "name": "shop-qa",
+        "description": "QA engineer for the e-Shop team. Reproduces buyer + seller flows end-to-end with Playwright on web and integration_test on mobile, files bugs, owns test fixtures. Use proactively after a feature is implemented and before it merges.",
+        "color": "#F59E0B",
+        "display_name": "Shop QA",
+        "e2e_framework": "Playwright",
+        "integration_framework": "Vitest + supertest",
+        "unit_framework": "Vitest"
+      }
+    },
+    {
+      "archetype": "security-engineer",
+      "values": {
+        "name": "shop-security",
+        "description": "Security engineer for the e-Shop team. Reviews any change touching auth, PCI surface (Stripe webhooks, payment metadata), user input handling, secrets, dependencies. Use proactively before any release and on every PR that adds an endpoint or env var.",
+        "color": "#EF4444",
+        "display_name": "Shop Security"
+      }
+    },
+    {
+      "archetype": "devops-engineer",
+      "values": {
+        "name": "shop-devops",
+        "description": "DevOps engineer for the e-Shop team. Owns CI/CD, Cloud Run + Vercel pipelines, Codemagic for mobile, secrets management, release tagging. Use proactively for any change touching .github/workflows/ or deploy/ manifests.",
+        "color": "#84CC16",
+        "display_name": "Shop DevOps",
+        "ci_paths": ".github/workflows/, deploy/"
+      }
+    },
+    {
+      "archetype": "monitor",
+      "values": {
+        "name": "shop-watcher",
+        "description": "Background monitor for the e-Shop team. Watches activity log, GitHub Actions runs, Sentry error rates, Stripe webhook failure rate. Surfaces only noteworthy or urgent events. Use proactively — fires automatically on every event.",
+        "color": "#A855F7",
+        "display_name": "Shop Watcher"
+      }
+    }
+  ],
+  "skills": [
+    {
+      "archetype": "coordination-skill",
+      "values": {
+        "name": "shop-status",
+        "description": "Run a quick e-Shop status check across services — ask each engineer for one-line health and surface blockers. Use proactively at the start of a work session.",
+        "display_name": "Daily Team Status",
+        "one_line_purpose": "Quickly poll every engineer for a one-line health report and surface anything blocking.",
+        "arg_hint": "[--services svc1,svc2]",
+        "example_arg": "--services api,web",
+        "step_1_name": "Pick the engineers to poll",
+        "step_1_body": "Default: all; with --services, only the specified services' owners.",
+        "step_2_name": "Dispatch in parallel",
+        "step_2_body": "One Agent call per engineer with the same prompt.",
+        "step_3_name": "Collate",
+        "step_3_body": "Wait for all responses; group by status (working / blocked / idle).",
+        "output_path": ".meetings/YYYY-MM-DD-status.md",
+        "output_description": "A short Markdown file with one section per engineer + a Top blockers summary + a Suggested next move from the orchestrator.",
+        "trigger_1": "Start of the work session.",
+        "trigger_2": "Before a /meet to set up the agenda.",
+        "antipattern_1": "Calling /shop-status in a loop",
+        "antipattern_1_why": "it costs an Agent call per engineer.",
+        "antipattern_2": "Treating the output as a substitute for /meet",
+        "antipattern_2_why": "it captures status, not decisions."
+      }
+    }
+  ],
+  "rules": [
+    "01-plan-first",
+    "02-service-boundaries",
+    "03-definition-of-done",
+    "04-clarify-unknowns",
+    "05-interrupt-handling",
+    "06-small-wins",
+    "07-parallel-execution",
+    "08-client-first-communication",
+    "09-no-quick-fixes",
+    "10-style-per-service",
+    "11-no-push-without-permission",
+    "12-security-vapt",
+    "13-model-selection"
+  ],
+  "hooks": ["notify", "session-init", "teammate-idle-gate", "post-commit-check"]
+}

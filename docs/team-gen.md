@@ -5,13 +5,23 @@ Turn a product description into a complete `.claude/` agent team in one command.
 ## Quick path
 
 ```bash
-# 1. Hand the assistant a brief (file or inline)
-/team-gen ./docs/product.md --target .
+# 1. Hand the assistant a brief (file or inline). Try the bundled example:
+/team-gen examples/example-prd.md --target .
 
 # 2. Answer any clarifying questions (the skill asks, never invents)
 
 # 3. Read the self-eval report at the bottom of the run
 ```
+
+Or run the example end-to-end without the skill, straight from the spec:
+
+```bash
+python3 plugins/agents-team/lib/gen/scaffold.py \
+  examples/example-team.json \
+  --target /tmp/eshop-demo
+```
+
+See [`examples/README.md`](../examples/README.md) for the full walkthrough.
 
 The skill is documented in [`plugins/agents-team/skills/team-gen/SKILL.md`](../plugins/agents-team/skills/team-gen/SKILL.md). What follows is the user-facing usage reference.
 
@@ -68,7 +78,7 @@ Hand-edit if you want to regenerate with a tweaked spec. Saving it under `.claud
 
 Every produced agent + skill is linted before the skill exits. A `reject` verdict on any file means the run failed, even if the rest passed. The exit code is the worst verdict observed.
 
-```
+```text
 === Self-evaluation ===
   shop-orch.md           A  100/100  ship
   api-engineer.md        A   97/100  ship
