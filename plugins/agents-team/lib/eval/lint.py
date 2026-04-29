@@ -83,7 +83,12 @@ FIRST_OR_SECOND_PERSON = re.compile(
     re.IGNORECASE,
 )
 USE_WHEN_TRIGGER = re.compile(
-    r"\b(use\s+(when|proactively|immediately(\s+after)?)|MUST\s+BE\s+USED)\b",
+    r"\b("
+    r"use\s+(when|whenever|before|after|proactively|immediately(\s+after)?)"
+    r"|MUST\s+BE\s+USED"
+    r"|invoke\s+when"
+    r"|trigger\s+when"
+    r")\b",
     re.IGNORECASE,
 )
 
