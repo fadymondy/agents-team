@@ -1,0 +1,46 @@
+{
+  "agent": "shop-qa",
+  "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/a-qa-engineer.md",
+  "kind": "agent",
+  "overall": {
+    "score": 100,
+    "grade": "A",
+    "verdict": "ship"
+  },
+  "dimensions": {
+    "frontmatter": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "description": {
+      "score": 100,
+      "weight": 0.25,
+      "findings": []
+    },
+    "tool_hygiene": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "model_fit": {
+      "score": 100,
+      "weight": 0.1,
+      "findings": []
+    },
+    "body_structure": {
+      "score": 100,
+      "weight": 0.2,
+      "findings": []
+    },
+    "anti_patterns": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    }
+  },
+  "findings": [],
+  "produced_by": "static",
+  "produced_at": "2026-04-29T12:02:03Z",
+  "schema_version": "1.0.0"
+}

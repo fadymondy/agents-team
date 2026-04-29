@@ -88,6 +88,22 @@ Markdown render:
 
 The canonical rubric lives at [`plugins/agents-team/lib/eval/rubric.md`](../plugins/agents-team/lib/eval/rubric.md). Every rule has a stable ID (`tool_hygiene.write_on_review_role`), severity, phase (static or judge), and a citation. Rules without citations go in `experimental/` and are off by default.
 
+## Calibration
+
+The LLM-as-judge is measured against a hand-graded calibration set under [`plugins/agents-team/lib/eval/calibration/`](../plugins/agents-team/lib/eval/calibration/). 15 fixture pairs span A–F grades. The Galileo-2026 target is ≥0.80 Spearman correlation per dimension; the CI floor is 0.75.
+
+```bash
+# Static-mode baseline (no API call; expected.json derived from static linter — Spearman 1.0)
+bash plugins/agents-team/lib/eval/calibrate.sh --static
+
+# Real judge run (requires ANTHROPIC_API_KEY + `pip install anthropic`)
+ANTHROPIC_API_KEY=sk-ant-... bash plugins/agents-team/lib/eval/calibrate.sh
+```
+
+The expected.json files are seeded from the static linter as the v0.1 baseline and **must be hand-tuned** over time to reflect a real human rater. See [`lib/eval/calibration/README.md`](../plugins/agents-team/lib/eval/calibration/README.md) for the full procedure.
+
+Any PR that touches `lib/eval/rubric.md` or `lib/eval/judge.py` runs calibration in CI when `ANTHROPIC_API_KEY` is available; a drop below the threshold blocks the merge.
+
 ## CI integration
 
 Add a step to your repo's CI:

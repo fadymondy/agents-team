@@ -1,0 +1,72 @@
+{
+  "agent": "api-engineer-b",
+  "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/b-api-engineer.md",
+  "kind": "agent",
+  "overall": {
+    "score": 99,
+    "grade": "A",
+    "verdict": "ship"
+  },
+  "dimensions": {
+    "frontmatter": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "description": {
+      "score": 100,
+      "weight": 0.25,
+      "findings": []
+    },
+    "tool_hygiene": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "model_fit": {
+      "score": 100,
+      "weight": 0.1,
+      "findings": []
+    },
+    "body_structure": {
+      "score": 95,
+      "weight": 0.2,
+      "findings": [
+        {
+          "severity": "suggestion",
+          "rule": "body_structure.no_constraints_section",
+          "message": "Body has no constraints / guardrails / anti-patterns section.",
+          "produced_by": "static",
+          "evidence": {
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/b-api-engineer.md",
+            "line": 13
+          },
+          "fix": "Add a \"## Constraints\" section listing what the agent must NOT do.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
+    },
+    "anti_patterns": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    }
+  },
+  "findings": [
+    {
+      "severity": "suggestion",
+      "rule": "body_structure.no_constraints_section",
+      "message": "Body has no constraints / guardrails / anti-patterns section.",
+      "produced_by": "static",
+      "evidence": {
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/b-api-engineer.md",
+        "line": 13
+      },
+      "fix": "Add a \"## Constraints\" section listing what the agent must NOT do.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    }
+  ],
+  "produced_by": "static",
+  "produced_at": "2026-04-29T12:02:03Z",
+  "schema_version": "1.0.0"
+}

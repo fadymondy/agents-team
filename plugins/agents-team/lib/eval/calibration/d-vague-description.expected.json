@@ -1,0 +1,179 @@
+{
+  "agent": "helper",
+  "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+  "kind": "agent",
+  "overall": {
+    "score": 89,
+    "grade": "B",
+    "verdict": "ship"
+  },
+  "dimensions": {
+    "frontmatter": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "description": {
+      "score": 65,
+      "weight": 0.25,
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "description.length_outside_band",
+          "message": "Agent description length 16 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "description",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+            "line": 3,
+            "value": "I help with code"
+          },
+          "fix": "Aim for one or two sentences with both WHAT and WHEN.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        },
+        {
+          "severity": "warning",
+          "rule": "description.first_or_second_person",
+          "message": "Description uses first/second person (e.g. \"I help\u2026\", \"you can use\u2026\"). Anthropic guidance: write descriptions in third person.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "description",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+            "line": 3,
+            "value": "I help"
+          },
+          "fix": "Rewrite in third person (\"Reviews code for\u2026\" not \"I review code for\u2026\").",
+          "source": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+        },
+        {
+          "severity": "suggestion",
+          "rule": "description.no_use_when_trigger",
+          "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "description",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+            "line": 3
+          },
+          "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
+    },
+    "tool_hygiene": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "model_fit": {
+      "score": 100,
+      "weight": 0.1,
+      "findings": []
+    },
+    "body_structure": {
+      "score": 90,
+      "weight": 0.2,
+      "findings": [
+        {
+          "severity": "suggestion",
+          "rule": "body_structure.no_when_invoked_section",
+          "message": "Body has no \"When invoked\" / procedure / workflow heading.",
+          "produced_by": "static",
+          "evidence": {
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+            "line": 11
+          },
+          "fix": "Add a numbered \"## When invoked\" section listing the agent's procedure.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        },
+        {
+          "severity": "suggestion",
+          "rule": "body_structure.no_constraints_section",
+          "message": "Body has no constraints / guardrails / anti-patterns section.",
+          "produced_by": "static",
+          "evidence": {
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+            "line": 11
+          },
+          "fix": "Add a \"## Constraints\" section listing what the agent must NOT do.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
+    },
+    "anti_patterns": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    }
+  },
+  "findings": [
+    {
+      "severity": "warning",
+      "rule": "description.length_outside_band",
+      "message": "Agent description length 16 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "description",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+        "line": 3,
+        "value": "I help with code"
+      },
+      "fix": "Aim for one or two sentences with both WHAT and WHEN.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
+      "rule": "description.first_or_second_person",
+      "message": "Description uses first/second person (e.g. \"I help\u2026\", \"you can use\u2026\"). Anthropic guidance: write descriptions in third person.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "description",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+        "line": 3,
+        "value": "I help"
+      },
+      "fix": "Rewrite in third person (\"Reviews code for\u2026\" not \"I review code for\u2026\").",
+      "source": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+    },
+    {
+      "severity": "suggestion",
+      "rule": "description.no_use_when_trigger",
+      "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "description",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+        "line": 3
+      },
+      "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "suggestion",
+      "rule": "body_structure.no_when_invoked_section",
+      "message": "Body has no \"When invoked\" / procedure / workflow heading.",
+      "produced_by": "static",
+      "evidence": {
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+        "line": 11
+      },
+      "fix": "Add a numbered \"## When invoked\" section listing the agent's procedure.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "suggestion",
+      "rule": "body_structure.no_constraints_section",
+      "message": "Body has no constraints / guardrails / anti-patterns section.",
+      "produced_by": "static",
+      "evidence": {
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+        "line": 11
+      },
+      "fix": "Add a \"## Constraints\" section listing what the agent must NOT do.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    }
+  ],
+  "produced_by": "static",
+  "produced_at": "2026-04-29T12:02:03Z",
+  "schema_version": "1.0.0"
+}

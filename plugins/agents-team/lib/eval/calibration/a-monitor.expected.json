@@ -1,0 +1,86 @@
+{
+  "agent": "shop-watcher",
+  "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/a-monitor.md",
+  "kind": "agent",
+  "overall": {
+    "score": 98,
+    "grade": "A",
+    "verdict": "ship"
+  },
+  "dimensions": {
+    "frontmatter": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    },
+    "description": {
+      "score": 100,
+      "weight": 0.25,
+      "findings": []
+    },
+    "tool_hygiene": {
+      "score": 85,
+      "weight": 0.15,
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "tool_hygiene.bash_without_safeguard_on_readonly",
+          "message": "Read-only role grants `Bash` without `permissionMode` or a `PreToolUse` hook to constrain it.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "tools",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/a-monitor.md",
+            "line": 9,
+            "value": [
+              "Read",
+              "Glob",
+              "Grep",
+              "Bash"
+            ]
+          },
+          "fix": "Either drop Bash, set `permissionMode`, or wire a PreToolUse hook to gate it.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
+    },
+    "model_fit": {
+      "score": 100,
+      "weight": 0.1,
+      "findings": []
+    },
+    "body_structure": {
+      "score": 100,
+      "weight": 0.2,
+      "findings": []
+    },
+    "anti_patterns": {
+      "score": 100,
+      "weight": 0.15,
+      "findings": []
+    }
+  },
+  "findings": [
+    {
+      "severity": "warning",
+      "rule": "tool_hygiene.bash_without_safeguard_on_readonly",
+      "message": "Read-only role grants `Bash` without `permissionMode` or a `PreToolUse` hook to constrain it.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "tools",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/a-monitor.md",
+        "line": 9,
+        "value": [
+          "Read",
+          "Glob",
+          "Grep",
+          "Bash"
+        ]
+      },
+      "fix": "Either drop Bash, set `permissionMode`, or wire a PreToolUse hook to gate it.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    }
+  ],
+  "produced_by": "static",
+  "produced_at": "2026-04-29T12:02:03Z",
+  "schema_version": "1.0.0"
+}
