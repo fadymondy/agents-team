@@ -165,6 +165,49 @@ jobs:
           echo "Generated layout OK"
 
   # -------------------------------------------------------------------------
+  # Job 5 — calibrate the LLM-as-judge against the hand-graded set.
+  # Always runs in --static mode (free, catches schema breaks). Runs the
+  # live judge when ANTHROPIC_API_KEY is available AND a rubric/judge file
+  # changed.
+  # -------------------------------------------------------------------------
+  calibrate:
+    name: judge calibration
+    runs-on: ubuntu-latest
+    # Hoist the optional secret to job env so the per-step `if` can compare
+    # against env (GHA doesn't allow `secrets` directly in `if`). When the
+    # secret isn't configured, env.ANTHROPIC_API_KEY is the empty string.
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: calibrate.sh --static (always)
+        run: bash plugins/agents-team/lib/eval/calibrate.sh --static
+      - name: Detect rubric / judge changes
+        id: changed
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          if git diff --name-only "$base" "$head" -- \
+              'plugins/agents-team/lib/eval/rubric.md' \
+              'plugins/agents-team/lib/eval/judge.py' | grep -q .; then
+            echo "ran=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "ran=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: calibrate.sh (live judge, when key + rubric/judge changed)
+        if: steps.changed.outputs.ran == 'true' && env.ANTHROPIC_API_KEY != ''
+        run: |
+          pip install anthropic
+          bash plugins/agents-team/lib/eval/calibrate.sh
+
+  # -------------------------------------------------------------------------
   # PR comment — summarize the lint job's per-file verdicts.
   # -------------------------------------------------------------------------
   comment:
