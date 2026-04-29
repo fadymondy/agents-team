@@ -1,0 +1,41 @@
+{
+  "_comment": "Merge this `hooks` block into your team's .claude/settings.json. Paths assume hooks live at .claude/hooks/.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash .claude/hooks/session-init.sh"
+      }
+    ],
+    "Notification": [
+      {
+        "type": "command",
+        "command": "bash .claude/hooks/notify.sh"
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "bash .claude/hooks/notify.sh"
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "type": "command",
+        "command": "bash .claude/hooks/notify.sh"
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "type": "command",
+        "command": "bash .claude/hooks/teammate-idle-gate.sh"
+      }
+    ],
+    "PostCommit": [
+      {
+        "type": "command",
+        "command": "bash .claude/hooks/post-commit-check.sh"
+      }
+    ]
+  }
+}
