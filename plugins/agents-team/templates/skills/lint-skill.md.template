@@ -1,0 +1,58 @@
+---
+name: {{name}}
+description: "{{description}}"
+disable-model-invocation: false
+user-invocable: true
+argument-hint: "{{arg_hint}}"
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash
+model: haiku
+---
+
+# /{{name}} — {{display_name}}
+
+{{one_line_purpose}}
+
+## Quick start
+
+```bash
+/{{name}} {{example_arg}}
+```
+
+## What it checks
+
+| Rule ID | Severity | What it catches |
+|---------|----------|-----------------|
+| `{{rule_1_id}}` | {{rule_1_sev}} | {{rule_1_desc}} |
+| `{{rule_2_id}}` | {{rule_2_sev}} | {{rule_2_desc}} |
+| `{{rule_3_id}}` | {{rule_3_sev}} | {{rule_3_desc}} |
+
+## Output
+
+JSON conforming to `{{schema_path}}` plus a Markdown report at `{{report_path}}`. One-line summary to stdout for log scraping.
+
+## Exit codes
+
+- `0` — verdict `ship`
+- `1` — verdict `revise` (or `ship` with `--ci` and any warnings)
+- `2` — verdict `reject`
+
+## When to use this skill
+
+- Before merging an agent / skill change.
+- In CI on any PR that touches `.claude/`.
+- During a {{periodicity}} sweep of the team's roster.
+
+## Anti-patterns
+
+- Treating the linter's output as authoritative without reading the evidence.
+- Ignoring `warning`-severity findings — they are the leading indicators.
+- Auto-applying suggested fixes without a diff review.
+
+## References
+
+- Rubric: `{{rubric_path}}`
+- Schema: `{{schema_path}}`

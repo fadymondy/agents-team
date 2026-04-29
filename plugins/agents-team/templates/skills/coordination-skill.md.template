@@ -1,0 +1,52 @@
+---
+name: {{name}}
+description: "{{description}}"
+disable-model-invocation: false
+user-invocable: true
+argument-hint: "{{arg_hint}}"
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - Bash
+  - Agent
+  - TodoWrite
+model: opus
+effort: high
+---
+
+# /{{name}} — {{display_name}}
+
+{{one_line_purpose}}
+
+## Quick start
+
+```bash
+/{{name}} {{example_arg}}
+```
+
+## What it does
+
+1. **{{step_1_name}}** — {{step_1_body}}
+2. **{{step_2_name}}** — {{step_2_body}}
+3. **{{step_3_name}}** — {{step_3_body}}
+4. **Persist output** — writes to `{{output_path}}`.
+
+## Output shape
+
+{{output_description}}
+
+## When to use this skill
+
+- {{trigger_1}}
+- {{trigger_2}}
+
+## Anti-patterns
+
+- {{antipattern_1}} — {{antipattern_1_why}}
+- {{antipattern_2}} — {{antipattern_2_why}}
+
+## Streaming
+
+This skill streams partial output as each agent / step completes — do not buffer the whole run before showing anything to the user.

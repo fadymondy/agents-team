@@ -1,0 +1,52 @@
+---
+name: {{name}}
+description: "{{description}}"
+disable-model-invocation: true
+user-invocable: true
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - Bash
+model: sonnet
+---
+
+# /{{name}} — {{display_name}}
+
+{{one_line_purpose}}
+
+## Quick start
+
+```bash
+/{{name}}
+```
+
+## What it does
+
+1. **Detect state** — read the team's existing files; figure out what is already provisioned.
+2. **Provision the missing** — only add what is missing. Idempotent: re-running is safe.
+3. **Print a status report** — what was already there, what was added, what the user should do next.
+
+## State checks
+
+- `{{check_1}}`
+- `{{check_2}}`
+- `{{check_3}}`
+
+## What it provisions
+
+- `{{provision_1}}`
+- `{{provision_2}}`
+- `{{provision_3}}`
+
+## When to use this skill
+
+- First-time team setup.
+- After cloning the repo to a new machine.
+- After an upgrade that adds a new required artifact.
+
+## Anti-patterns
+
+- Overwriting existing files without asking — always diff and confirm.
+- Re-running and producing duplicates — use idempotent checks.

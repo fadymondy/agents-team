@@ -1,0 +1,50 @@
+---
+name: {{name}}
+description: "{{description}}"
+disable-model-invocation: false
+user-invocable: true
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+model: sonnet
+---
+
+# /{{name}} — {{display_name}}
+
+{{one_line_purpose}}
+
+## Quick start
+
+```bash
+/{{name}} {{example_arg}}
+```
+
+## When to use this skill
+
+- {{trigger_1}}
+- {{trigger_2}}
+- {{trigger_3}}
+
+## Patterns
+
+### {{pattern_1_name}}
+
+{{pattern_1_body}}
+
+### {{pattern_2_name}}
+
+{{pattern_2_body}}
+
+## Anti-patterns
+
+- {{antipattern_1}}
+- {{antipattern_2}}
+
+## References
+
+- `{{owned_paths}}` — files this skill touches
+- `{{related_skill}}` — related skill to chain after this one
