@@ -30,7 +30,7 @@ The instruction-following gap (agent claims a thing, env shows it didn't happen)
 /evaluate-agent-behavior --max-turns 30 .claude/agents/api-engineer.md transcript.jsonl
 ```
 
-## v0.1 scope (replay only)
+## Rules (v0.2)
 
 `lib/eval/replay.py` reads a Claude Code subagent transcript (JSONL) and grades:
 
@@ -39,17 +39,19 @@ The instruction-following gap (agent claims a thing, env shows it didn't happen)
 | `behavioral.tool_whitelist_violation` | critical | Tool calls not declared in the agent's `tools` field |
 | `behavioral.no_declared_tools`        | suggestion | Agent has no `tools:` so whitelist cannot be measured |
 | `behavioral.step_efficiency_exceeded` | warning | Turn count exceeds the expected band |
+| `behavioral.domain_adherence_violation` | warning | Tool calls touch paths outside the agent's `owned_paths` |
+| `behavioral.self_correction_failure`    | warning | Same tool call repeated 3+ times consecutively |
+| `behavioral.error_silently_swallowed`   | warning | Tool returned an error and the agent's next text didn't surface it |
+| `behavioral.output_format_drift`        | suggestion | Body promised "## Critical / Warnings / …" sections that the response is missing |
+| `behavioral.instruction_following_gap_claim_detected` | suggestion | Agent made verifiable claims ("I have updated X", "Tests now pass"); env-verification is v0.3 |
 
-Output conforms to `lib/eval/schema/v1.json` with `produced_by: "behavioral"` and a `behavioral_metadata` block listing `transcript_path`, `turn_count`, and `tool_call_count`.
+Output conforms to `lib/eval/schema/v1.json` with `produced_by: "behavioral"` and a `behavioral_metadata` block listing `transcript_path`, `turn_count`, `tool_call_count`, and `text_block_count`.
 
-## v0.2 scope (deferred — see issue #12 for the full plan)
+## v0.3 scope (deferred — see issue #18 for the fixture runner)
 
-- **Domain adherence** (LLM-judge): tool calls touch only files / services named or implied by the description.
-- **Self-correction signal**: after a wrong tool call, is the next call corrective?
-- **Output-format adherence**: does the response have the sections the body promised?
-- **Error surfacing vs silent failure**: when a tool returns an error, does the agent report or pretend success?
-- **Instruction-following gap detector**: parse agent claims ("I have updated X"), verify against env state.
-- **Fixture runner**: per-archetype prompts in `templates/eval-fixtures/<archetype>/`, headless `claude --agent` runner, LangChain-style trajectory match (strict / unordered / subset / superset).
+- **Domain adherence (real LLM-judge)** — current v0.2 implementation is a deterministic path-prefix heuristic; v0.3 will add an LLM-judge that understands "this file is implied by the description" beyond literal path matching.
+- **Instruction-following gap (real env-verification)** — v0.2 detects claims ("I have updated X", "Tests now pass") and emits a suggestion. v0.3 will run filesystem / `git status` / last-test-exit-code verification to upgrade matched claims to a `critical` finding when the env contradicts them.
+- **Fixture runner** — per-archetype prompts in `templates/eval-fixtures/<archetype>/`, headless `claude --agent` runner, LangChain-style trajectory match (strict / unordered / subset / superset). Tracked in #18.
 
 ## Where transcripts live
 
