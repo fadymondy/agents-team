@@ -1,0 +1,17 @@
+# Optional Python dependencies for agents-team.
+#
+# The core toolchain runs on stdlib alone:
+#   - lib/eval/lint.py   (static linter)
+#   - lib/eval/render.sh (jq-based, no Python deps)
+#   - lib/eval/replay.py (behavioral replay grader)
+#   - lib/gen/render.py  (template renderer)
+#   - lib/gen/scaffold.py (team scaffolder)
+#
+# The optional bits below are only needed for specific features.
+
+# --- Phase 2 LLM-as-judge: only needed for `/evaluate-agent --deep` in live mode.
+# Without this package, judge.py runs in dry-run + emits judge.skipped_no_sdk findings.
+anthropic>=0.40.0
+
+# --- Test suite (issue #14): only needed when running `pytest`.
+pytest>=8.0

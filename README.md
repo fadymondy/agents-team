@@ -79,6 +79,14 @@ v0.1 shipped. See the [v0.1 milestone](https://github.com/fadymondy/agents-team/
 
 See [`docs/contributing.md`](docs/contributing.md) — adding archetypes, adding rubric line-items, the gh-pms workflow.
 
+## Project
+
+- [`CHANGELOG.md`](CHANGELOG.md) — release history (auto-updated)
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
+- [`SECURITY.md`](SECURITY.md) — vulnerability disclosure policy
+- [`requirements.txt`](requirements.txt) — optional Python deps for live judge + tests
+- [`docs/`](docs/) — per-pillar guides (`team-gen`, `meet`, `evaluator`, `contributing`)
+
 ## License
 
 [MIT](LICENSE)
