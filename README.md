@@ -61,9 +61,19 @@ The evaluator is the architectural anchor. Every rule cites Anthropic's spec or 
 
 See [`docs/evaluator.md`](docs/evaluator.md) for the rubric, the schema, and the CI integration recipe.
 
+## What's new
+
+**v0.1.0 — 2026-04-29.** Initial release. All three pillars shipped: `/team-gen`, `/meet`, `/evaluate-agent` (static + judge skeleton + behavioral skeleton). 8 agent + 4 skill archetypes, 13 rule templates, 4 hook templates, citation-backed rubric. See [CHANGELOG.md](CHANGELOG.md) for the full list.
+
+The CHANGELOG auto-updates on every push to `main` via [git-cliff](https://github.com/orhun/git-cliff) — write conventional-commit messages (`feat:`, `fix:`, `chore:`, …) and they land in the right section.
+
+## Sponsor
+
+If this saves you time, consider [sponsoring @fadymondy on GitHub](https://github.com/sponsors/fadymondy).
+
 ## Status
 
-v0.1 in development. See the [v0.1 milestone](https://github.com/fadymondy/agents-team/milestone/1) for the breakdown.
+v0.1 shipped. See the [v0.1 milestone](https://github.com/fadymondy/agents-team/milestone/1) for the breakdown and the [issues page](https://github.com/fadymondy/agents-team/issues) for v0.2 work as it gets filed.
 
 ## Contributing
 
