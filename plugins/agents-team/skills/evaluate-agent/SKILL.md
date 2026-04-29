@@ -30,6 +30,11 @@ Phase 1 of the agents-team evaluator. Deterministic. Cheap. CI-safe. Every rule 
 
 # Strict mode: promote suggestion-severity findings to warnings
 /evaluate-agent --strict path/to/SKILL.md
+
+# Deep mode: run the LLM-as-judge after the static linter (Phase 2).
+# Requires `pip install anthropic` and ANTHROPIC_API_KEY.
+# Without those, judge dimensions emit a `judge.skipped_no_sdk` suggestion.
+/evaluate-agent --deep .claude/agents/code-reviewer.md
 ```
 
 ## What it checks

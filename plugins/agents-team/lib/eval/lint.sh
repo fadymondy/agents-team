@@ -17,13 +17,14 @@
 #
 # Requires: python3 (stdlib only), jq.
 
-set -u
+set -e
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PYTHON="${PYTHON_BIN:-python3}"
 
 ci=0
 strict=0
+deep=0
 mode="files"   # files | stdout-md | stdout-json
 
 while [[ $# -gt 0 ]]; do
@@ -32,8 +33,9 @@ while [[ $# -gt 0 ]]; do
     --json)   mode="stdout-json"; shift ;;
     --ci)     ci=1; shift ;;
     --strict) strict=1; shift ;;
+    --deep)   deep=1; shift ;;
     -h|--help)
-      sed -n 's/^# //p' "$0" | head -n 18
+      sed -n 's/^# //p' "$0" | head -n 22
       exit 0
       ;;
     --) shift; break ;;
@@ -58,8 +60,7 @@ if [[ ! -f "$target" ]]; then
   exit 66
 fi
 
-# Run the linter. We capture both stdout (JSON) and the python exit code so we
-# can carry it through to the user.
+# Run the static linter. Capture stdout (JSON) and python exit code.
 strict_arg=()
 [[ "$strict" -eq 1 ]] && strict_arg=(--strict)
 
@@ -67,6 +68,37 @@ set +e
 json_out="$("$PYTHON" "$HERE/lint.py" "${strict_arg[@]}" "$target")"
 py_rc=$?
 set -e
+
+# --deep: chain to the LLM-as-judge (Phase 2). Merge its findings into
+# the static report so consumers see one combined view.
+if [[ "$deep" -eq 1 ]]; then
+  set +e
+  judge_out="$("$PYTHON" "$HERE/judge.py" "$target")"
+  judge_rc=$?
+  set -e
+  if [[ -n "$judge_out" ]]; then
+    json_out="$(jq -n \
+      --argjson static "$json_out" \
+      --argjson judge  "$judge_out" \
+      '$static
+       | .findings = ($static.findings + ($judge.findings // []))
+       | .dimensions = (
+           .dimensions
+           | to_entries
+           | map(
+               . as $e
+               | .value.findings = (.value.findings + (($judge.dimensions[$e.key].findings) // []))
+               | .
+             )
+           | from_entries
+         )
+       | .judge_model = ($judge.judge_model // null)
+       | .rubric_version = ($judge.rubric_version // null)
+       | .produced_by = "static+judge"')"
+    # Take the more severe of the two verdicts.
+    if [[ "$judge_rc" -gt "$py_rc" ]]; then py_rc="$judge_rc"; fi
+  fi
+fi
 
 case "$mode" in
   stdout-json)
