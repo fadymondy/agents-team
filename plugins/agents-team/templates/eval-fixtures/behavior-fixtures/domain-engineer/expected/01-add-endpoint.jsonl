@@ -1,0 +1,4 @@
+{"name": "Read", "input": {"path": "services/api/orders.ts"}}
+{"name": "Edit", "input": {"path": "services/api/orders.ts"}}
+{"name": "Write", "input": {"path": "services/api/orders.test.ts"}}
+{"name": "Bash", "input": {"command": "pnpm --filter api test"}}

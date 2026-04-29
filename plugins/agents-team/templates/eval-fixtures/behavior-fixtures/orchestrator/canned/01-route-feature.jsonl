@@ -1,0 +1,5 @@
+{"type": "turn"}
+{"type": "tool_use", "name": "Read", "input": {"path": "services/api/checkout.ts"}}
+{"type": "tool_use", "name": "Agent", "input": {"description": "investigate multi-seller checkout"}}
+{"type": "turn"}
+{"type": "text", "text": "Routed to payments-engineer to investigate the multi-seller checkout failure. Will delegate further if it spans services."}

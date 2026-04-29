@@ -21,14 +21,50 @@ The instruction-following gap (agent claims a thing, env shows it didn't happen)
 ## Quick start
 
 ```bash
-# Replay a transcript that already exists
+# Mode A: replay an existing transcript (lib/eval/replay.py)
 /evaluate-agent-behavior \
   .claude/agents/code-reviewer.md \
   ~/.claude/projects/<slug>/subagents/agent-2026-04-29-1142.jsonl
 
-# Override the max-turns expected band
+# Mode A: override the max-turns expected band
 /evaluate-agent-behavior --max-turns 30 .claude/agents/api-engineer.md transcript.jsonl
+
+# Mode B: fixture runner — exercise an agent against canned prompts
+python3 plugins/agents-team/lib/eval/runner.py \
+  --agent .claude/agents/api-engineer.md \
+  --fixture-dir plugins/agents-team/templates/eval-fixtures/behavior-fixtures/domain-engineer \
+  --canned
+
+# Mode B: live (requires `claude` CLI on PATH; sandboxed env only)
+python3 plugins/agents-team/lib/eval/runner.py \
+  --agent .claude/agents/api-engineer.md \
+  --fixture-dir plugins/agents-team/templates/eval-fixtures/behavior-fixtures/domain-engineer
 ```
+
+## Mode B fixture layout
+
+A fixture set lives under `templates/eval-fixtures/behavior-fixtures/<archetype>/`:
+
+```text
+<archetype>/
+  prompts/<n>.md       input the runner sends to the agent
+  expected/<n>.jsonl   reference tool-call trajectory (one event per line)
+  canned/<n>.jsonl     pre-recorded transcript (used in --canned mode)
+  assertions.yaml      per-fixture match_mode + outcome assertions
+```
+
+`assertions.yaml` shape:
+
+```yaml
+01-add-endpoint:
+  match_mode: subset       # one of strict | unordered | subset | superset
+  arg_keys: [path]         # optional; defaults to name-only matching
+  expected_outcome:
+    - kind: text_contains  # text_contains | text_not_contains
+      value: "tests pass"
+```
+
+3 archetype sets ship with the plugin (orchestrator, domain-engineer, qa-engineer; 6 fixtures total). Adding a new set is the natural extension path.
 
 ## Rules (v0.2)
 

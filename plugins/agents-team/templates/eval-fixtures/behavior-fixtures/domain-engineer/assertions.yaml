@@ -1,0 +1,13 @@
+01-add-endpoint:
+  match_mode: subset
+  arg_keys: [path]
+  expected_outcome:
+    - kind: text_contains
+      value: "tests pass"
+
+02-fix-bug:
+  match_mode: subset
+  arg_keys: [path]
+  expected_outcome:
+    - kind: text_contains
+      value: "Root cause"

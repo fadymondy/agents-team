@@ -1,0 +1,12 @@
+01-write-e2e:
+  match_mode: subset
+  arg_keys: [path]
+  expected_outcome:
+    - kind: text_contains
+      value: "tests pass"
+
+02-repro-bug:
+  match_mode: unordered
+  expected_outcome:
+    - kind: text_contains
+      value: "Bug filed"

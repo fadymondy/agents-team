@@ -1,0 +1,3 @@
+{"name": "Read", "input": {"path": "apps/web/playwright.config.ts"}}
+{"name": "Write", "input": {"path": "apps/web/e2e/guest-checkout.spec.ts"}}
+{"name": "Bash", "input": {"command": "pnpm --filter web test:e2e"}}

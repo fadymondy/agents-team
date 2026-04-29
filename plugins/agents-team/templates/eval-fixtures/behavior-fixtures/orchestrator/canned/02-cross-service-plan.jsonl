@@ -1,0 +1,6 @@
+{"type": "turn"}
+{"type": "tool_use", "name": "Write", "input": {"path": ".plans/2026-04-29-multi-currency.md"}}
+{"type": "tool_use", "name": "Agent", "input": {"description": "draft api spec"}}
+{"type": "tool_use", "name": "Agent", "input": {"description": "draft web changes"}}
+{"type": "turn"}
+{"type": "text", "text": "Plan saved at .plans/2026-04-29-multi-currency.md. Dispatched api-engineer and web-engineer to delegate work in parallel."}

@@ -1,0 +1,2 @@
+{"name": "Bash", "input": {"command": "curl -X POST .../orders/123/cancel"}}
+{"name": "Write", "input": {"path": "bug-reports/2026-04-29-cancel-partial-refund.md"}}

@@ -1,0 +1,11 @@
+01-route-feature:
+  match_mode: subset
+  expected_outcome:
+    - kind: text_contains
+      value: "delegate"
+
+02-cross-service-plan:
+  match_mode: unordered
+  expected_outcome:
+    - kind: text_contains
+      value: ".plans/"

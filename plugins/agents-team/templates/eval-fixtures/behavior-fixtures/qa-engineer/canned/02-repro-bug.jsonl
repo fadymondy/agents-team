@@ -1,0 +1,5 @@
+{"type": "turn"}
+{"type": "tool_use", "name": "Bash", "input": {"command": "curl -X POST .../orders/123/cancel"}}
+{"type": "tool_use", "name": "Write", "input": {"path": "bug-reports/2026-04-29-cancel-partial-refund.md"}}
+{"type": "turn"}
+{"type": "text", "text": "Reproduced; the cancel endpoint chokes when refunds.length > 0. Bug filed at bug-reports/2026-04-29-cancel-partial-refund.md with severity high."}
