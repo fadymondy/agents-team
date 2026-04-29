@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/fadymondy/agents-team/schema/v1",
+  "title": "Agent Quality Evaluation Report",
+  "description": "Output schema for the agents-team evaluator. Every phase (static, judge, behavioral) emits this shape.",
+  "type": "object",
+  "required": ["agent", "path", "overall", "dimensions", "findings", "schema_version"],
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "type": "string",
+      "description": "Agent or skill name (the value of the `name:` field in the source file)."
+    },
+    "path": {
+      "type": "string",
+      "description": "Path to the source file that was evaluated."
+    },
+    "kind": {
+      "enum": ["agent", "skill"],
+      "description": "Whether the evaluated file is an agent or a skill. Affects which dimension weights apply."
+    },
+    "overall": {
+      "type": "object",
+      "required": ["score", "grade", "verdict"],
+      "additionalProperties": false,
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "grade": { "enum": ["A", "B", "C", "D", "F"] },
+        "verdict": { "enum": ["ship", "revise", "reject"] }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "frontmatter",
+        "description",
+        "tool_hygiene",
+        "model_fit",
+        "body_structure",
+        "anti_patterns"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "frontmatter":     { "$ref": "#/$defs/dimension" },
+        "description":     { "$ref": "#/$defs/dimension" },
+        "tool_hygiene":    { "$ref": "#/$defs/dimension" },
+        "model_fit":       { "$ref": "#/$defs/dimension" },
+        "body_structure":  { "$ref": "#/$defs/dimension" },
+        "anti_patterns":   { "$ref": "#/$defs/dimension" }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Aggregated list of findings across all dimensions. Same objects appear inside `dimensions.<name>.findings`.",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "produced_by": {
+      "enum": ["static", "judge", "behavioral"],
+      "description": "Which evaluator phase produced this report."
+    },
+    "produced_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "judge_model": {
+      "type": "string",
+      "description": "Model ID of the judge, when produced_by == judge."
+    },
+    "behavioral_metadata": {
+      "type": "object",
+      "description": "Present when produced_by == behavioral.",
+      "properties": {
+        "transcript_path": { "type": "string" },
+        "fixture_name":    { "type": "string" },
+        "turn_count":      { "type": "integer", "minimum": 0 }
+      }
+    },
+    "schema_version": { "const": "1.0.0" }
+  },
+  "$defs": {
+    "dimension": {
+      "type": "object",
+      "required": ["score", "weight", "findings"],
+      "additionalProperties": false,
+      "properties": {
+        "score":   { "type": "integer", "minimum": 0, "maximum": 100 },
+        "weight":  { "type": "number",  "minimum": 0, "maximum": 1 },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["severity", "rule", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "severity": { "enum": ["critical", "warning", "suggestion"] },
+        "rule": {
+          "type": "string",
+          "description": "Dotted rule ID, e.g., `tools.write_on_review_role`.",
+          "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"
+        },
+        "message":  { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Free-form evidence: file:line, frontmatter field, value, transcript turn id, etc."
+        },
+        "fix":      { "type": "string", "description": "One-line suggested fix." },
+        "source":   { "type": "string", "format": "uri", "description": "URL of the rule's authoritative source." },
+        "produced_by": { "enum": ["static", "judge", "behavioral"] }
+      }
+    }
+  }
+}

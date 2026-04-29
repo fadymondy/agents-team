@@ -1,0 +1,50 @@
+{
+  "agent": "code-reviewer",
+  "path": ".claude/agents/code-reviewer.md",
+  "kind": "agent",
+  "overall": {
+    "score": 78,
+    "grade": "B",
+    "verdict": "ship"
+  },
+  "dimensions": {
+    "frontmatter":     { "score": 95, "weight": 0.15, "findings": [] },
+    "description":     { "score": 80, "weight": 0.25, "findings": [] },
+    "tool_hygiene":    { "score": 60, "weight": 0.15, "findings": [] },
+    "model_fit":       { "score": 100, "weight": 0.10, "findings": [] },
+    "body_structure":  { "score": 75, "weight": 0.20, "findings": [] },
+    "anti_patterns":   { "score": 90, "weight": 0.15, "findings": [] }
+  },
+  "findings": [
+    {
+      "severity": "critical",
+      "rule": "tools.write_on_review_role",
+      "message": "Agent description says \"reviews\" but `tools` includes `Edit`",
+      "evidence": { "frontmatter_field": "tools", "value": "Read, Edit, Bash" },
+      "fix": "Remove `Edit`; reviewer agents should be read-only.",
+      "source": "https://code.claude.com/docs/en/sub-agents",
+      "produced_by": "static"
+    },
+    {
+      "severity": "warning",
+      "rule": "description.no_use_when_trigger",
+      "message": "Description does not contain a \"use when\" or \"use proactively\" trigger phrase, so the orchestrator may under-delegate.",
+      "evidence": { "frontmatter_field": "description", "value": "Reviews code for quality and security." },
+      "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
+      "source": "https://code.claude.com/docs/en/sub-agents",
+      "produced_by": "static"
+    },
+    {
+      "severity": "suggestion",
+      "rule": "body_structure.no_when_invoked_section",
+      "message": "Body has no \"When invoked\" or numbered procedural section.",
+      "evidence": { "file": ".claude/agents/code-reviewer.md", "line": 12 },
+      "fix": "Add a numbered \"When invoked\" section listing the agent's procedure.",
+      "source": "https://code.claude.com/docs/en/sub-agents",
+      "produced_by": "static"
+    }
+  ],
+  "produced_by": "static",
+  "produced_at": "2026-04-29T11:30:00Z",
+  "schema_version": "1.0.0"
+}
