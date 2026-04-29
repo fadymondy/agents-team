@@ -10,7 +10,7 @@ This guide covers all three.
 
 ## Project layout
 
-```
+```text
 plugins/agents-team/
   .claude-plugin/plugin.json    manifest
   agents/                       plugin's own subagents (rare)
@@ -69,11 +69,13 @@ Steps:
 5. If `judge`: it's automatically picked up by `judge.py` from the rubric — no code change needed.
 6. Add a known-bad fixture at `templates/eval-fixtures/known-bad/<rule>.md` that exercises the rule. The linter must produce a finding with the matching ID.
 7. Run the full smoke test:
+
    ```bash
    for f in plugins/agents-team/templates/eval-fixtures/known-bad/*.md; do
      python3 plugins/agents-team/lib/eval/lint.py "$f"
    done
    ```
+
 8. Update the calibration set if you've changed how an existing rule fires (Galileo 0.80 Spearman target).
 
 ## Add a new rule template
@@ -115,6 +117,37 @@ A formal pytest layer is a v0.2 issue.
 - **Bash** — works under bash 3.2 (macOS default) and bash 5+ (Linux). No `set -u` if you can avoid it; tests have shown it bites with empty arrays.
 - **Markdown** — third-person descriptions in skills; numbered procedures in agents; cite sources for any rule.
 - **Comments** — only when the *why* is non-obvious. The code's *what* should be obvious from naming and structure.
+
+## Release ritual
+
+Releases are tagged `v<MAJOR>.<MINOR>.<PATCH>` and follow [Semantic Versioning](https://semver.org/). The `plugin.json` version is the source of truth: a release commit bumps it from `<X.Y.Z>-dev` to `<X.Y.Z>`, the commit is tagged, and a follow-up commit bumps to `<X.Y+1.0>-dev` so "is this a release build?" is answerable from the manifest alone.
+
+Procedure:
+
+```bash
+# 1. Verify CHANGELOG.md has a polished section for the upcoming version
+#    (the auto-changelog workflow keeps [Unreleased] up to date).
+# 2. Bump the manifest:
+sed -i '' 's/"version": "0\.X\.Y-dev"/"version": "0.X.Y"/' plugins/agents-team/.claude-plugin/plugin.json
+git add plugins/agents-team/.claude-plugin/plugin.json
+git commit -m "chore(release): v0.X.Y"
+
+# 3. Tag and push:
+git tag -a v0.X.Y -m "v0.X.Y — <one-line summary>"
+git push origin main
+git push origin v0.X.Y
+
+# 4. The release.yml workflow auto-creates the GitHub Release with notes
+#    extracted from CHANGELOG.md via git-cliff --latest. No manual step.
+
+# 5. Bump to next dev:
+sed -i '' 's/"version": "0\.X\.Y"/"version": "0.X+1.0-dev"/' plugins/agents-team/.claude-plugin/plugin.json
+git add plugins/agents-team/.claude-plugin/plugin.json
+git commit -m "chore: post-release bump to 0.X+1.0-dev"
+git push
+```
+
+Tag style is `vX.Y.Z` (with the `v`), matching git-cliff's default tag pattern in `cliff.toml`.
 
 ## License
 
