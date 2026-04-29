@@ -1,0 +1,20 @@
+# Claude Code local-only state
+.claude/settings.local.json
+.claude/agent-memory/
+.claude/agent-activity.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node (in case the plugin grows JS tooling)
+node_modules/
+*.log
+.env
+.env.local
