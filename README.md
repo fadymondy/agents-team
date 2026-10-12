@@ -1,5 +1,9 @@
 # agents-team
 
+<!-- Product Hunt badge: hidden until the post launches (it 404s while a draft). On launch day, remove this comment wrapper.
+<a href="https://www.producthunt.com/posts/claude-agents-team?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-claude-agents-team" target="_blank" rel="noopener"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1277742&theme=dark"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1277742&theme=light" alt="Claude Agents Team - Featured on Product Hunt" width="250" height="54" loading="lazy" /></picture></a>
+-->
+
 A Claude Code plugin that turns "build me an agent team" from a one-off craft into a repeatable, measurable pipeline.
 
 Three pillars:
