@@ -71,6 +71,8 @@ The CHANGELOG auto-updates on every push to `main` via [git-cliff](https://githu
 
 If this saves you time, consider [sponsoring @fadymondy on GitHub](https://github.com/sponsors/fadymondy).
 
+Or back agents-team directly on Open Collective: **[opencollective.com/claude-agents-team →](https://opencollective.com/claude-agents-team)**
+
 ## Status
 
 v0.1 shipped. See the [v0.1 milestone](https://github.com/fadymondy/agents-team/milestone/1) for the breakdown and the [issues page](https://github.com/fadymondy/agents-team/issues) for v0.2 work as it gets filed.
