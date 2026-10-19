@@ -15,12 +15,14 @@
 # Exit codes:
 #   0 = ship  ;  1 = revise  ;  2 = reject  ;  64 = bad CLI  ;  66 = file not found
 #
-# Requires: python3 (stdlib only), jq.
+# Requires: Python 3 (stdlib only; python3, python or `py -3`), jq.
 
 set -e
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-PYTHON="${PYTHON_BIN:-python3}"
+# shellcheck source=_python.sh
+source "$HERE/_python.sh"
+pick_python || exit 69
 
 ci=0
 strict=0
@@ -65,7 +67,7 @@ strict_arg=()
 [[ "$strict" -eq 1 ]] && strict_arg=(--strict)
 
 set +e
-json_out="$("$PYTHON" "$HERE/lint.py" "${strict_arg[@]}" "$target")"
+json_out="$("${PYTHON[@]}" "$HERE/lint.py" "${strict_arg[@]}" "$target")"
 py_rc=$?
 set -e
 
@@ -73,7 +75,7 @@ set -e
 # the static report so consumers see one combined view.
 if [[ "$deep" -eq 1 ]]; then
   set +e
-  judge_out="$("$PYTHON" "$HERE/judge.py" "$target")"
+  judge_out="$("${PYTHON[@]}" "$HERE/judge.py" "$target")"
   judge_rc=$?
   set -e
   if [[ -n "$judge_out" ]]; then

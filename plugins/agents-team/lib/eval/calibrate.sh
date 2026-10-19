@@ -22,7 +22,9 @@
 set -e
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-PYTHON="${PYTHON_BIN:-python3}"
+# shellcheck source=_python.sh
+source "$HERE/_python.sh"
+pick_python || exit 69
 CAL_DIR="$HERE/calibration"
 
 mode="judge"
@@ -82,20 +84,20 @@ for fixture in "$CAL_DIR"/*.md; do
   # not a calibrate failure. Keep stdout, drop the exit code.
   set +e
   if [[ "$mode" == "judge" ]]; then
-    actual_json="$("$PYTHON" "$HERE/judge.py" --no-cache "$fixture")"
+    actual_json="$("${PYTHON[@]}" "$HERE/judge.py" --no-cache "$fixture")"
   else
-    actual_json="$("$PYTHON" "$HERE/lint.py" "$fixture")"
+    actual_json="$("${PYTHON[@]}" "$HERE/lint.py" "$fixture")"
   fi
   set -e
   expected_json="$(cat "$expected")"
 
   for dim in "${dimensions[@]}"; do
     if [[ "$dim" == "overall" ]]; then
-      a=$(echo "$actual_json"  | "$PYTHON" -c "import json,sys; print(json.load(sys.stdin)['overall']['score'])")
-      h=$(echo "$expected_json"| "$PYTHON" -c "import json,sys; print(json.load(sys.stdin)['overall']['score'])")
+      a=$(echo "$actual_json"  | "${PYTHON[@]}" -c "import json,sys; print(json.load(sys.stdin)['overall']['score'])")
+      h=$(echo "$expected_json"| "${PYTHON[@]}" -c "import json,sys; print(json.load(sys.stdin)['overall']['score'])")
     else
-      a=$(echo "$actual_json"  | "$PYTHON" -c "import json,sys; print(json.load(sys.stdin)['dimensions']['$dim']['score'])")
-      h=$(echo "$expected_json"| "$PYTHON" -c "import json,sys; print(json.load(sys.stdin)['dimensions']['$dim']['score'])")
+      a=$(echo "$actual_json"  | "${PYTHON[@]}" -c "import json,sys; print(json.load(sys.stdin)['dimensions']['$dim']['score'])")
+      h=$(echo "$expected_json"| "${PYTHON[@]}" -c "import json,sys; print(json.load(sys.stdin)['dimensions']['$dim']['score'])")
     fi
     printf '%s\t%s\n' "$a" "$h" >> "$tmp_root/$dim.tsv"
   done
@@ -114,7 +116,7 @@ echo "------------------------------------------------------"
 worst=1.0
 fail=0
 for dim in "${dimensions[@]}"; do
-  rho="$("$PYTHON" "$HERE/spearman.py" "$tmp_root/$dim.tsv")"
+  rho="$("${PYTHON[@]}" "$HERE/spearman.py" "$tmp_root/$dim.tsv")"
   status="—"
   if [[ "$rho" == "nan" ]]; then
     status="n/a"

@@ -41,6 +41,8 @@ python3 plugins/agents-team/lib/eval/runner.py \
   --fixture-dir plugins/agents-team/templates/eval-fixtures/behavior-fixtures/domain-engineer
 ```
 
+On Windows, `python3` is often the Microsoft Store alias and does nothing. Use the first that works: `python3 -c 1`, then `python`, then `py -3`.
+
 ## Mode B fixture layout
 
 A fixture set lives under `templates/eval-fixtures/behavior-fixtures/<archetype>/`:
