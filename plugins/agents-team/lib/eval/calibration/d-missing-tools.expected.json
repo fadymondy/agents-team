@@ -3,8 +3,8 @@
   "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-missing-tools.md",
   "kind": "agent",
   "overall": {
-    "score": 92,
-    "grade": "A",
+    "score": 87,
+    "grade": "B",
     "verdict": "reject"
   },
   "dimensions": {
@@ -14,9 +14,24 @@
       "findings": []
     },
     "description": {
-      "score": 100,
+      "score": 85,
       "weight": 0.25,
-      "findings": []
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "description.generic_scope",
+          "message": "Description scopes the role with a filler word (\"whatever\") instead of a domain, so the orchestrator cannot tell when to route here.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "description",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-missing-tools.md",
+            "line": 3,
+            "value": "Edits the codebase, runs commands, and does whatever is needed. Use when something needs doing."
+          },
+          "fix": "Name the domain and the artifacts it owns (\"Owns the Stripe payment handlers in services/payments/…\").",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
     },
     "tool_hygiene": {
       "score": 60,
@@ -25,7 +40,7 @@
         {
           "severity": "critical",
           "rule": "tool_hygiene.tools_omitted",
-          "message": "`tools` is not set \u2014 the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
+          "message": "`tools` is not set — the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "tools"
@@ -36,9 +51,24 @@
       ]
     },
     "model_fit": {
-      "score": 100,
+      "score": 85,
       "weight": 0.1,
-      "findings": []
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "model_fit.opus_on_generic_role",
+          "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "model",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-missing-tools.md",
+            "line": 4,
+            "value": "opus"
+          },
+          "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
     },
     "body_structure": {
       "score": 90,
@@ -80,12 +110,40 @@
     {
       "severity": "critical",
       "rule": "tool_hygiene.tools_omitted",
-      "message": "`tools` is not set \u2014 the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
+      "message": "`tools` is not set — the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "tools"
       },
       "fix": "Add an explicit `tools:` list, even if it is the full set you actually need.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
+      "rule": "description.generic_scope",
+      "message": "Description scopes the role with a filler word (\"whatever\") instead of a domain, so the orchestrator cannot tell when to route here.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "description",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-missing-tools.md",
+        "line": 3,
+        "value": "Edits the codebase, runs commands, and does whatever is needed. Use when something needs doing."
+      },
+      "fix": "Name the domain and the artifacts it owns (\"Owns the Stripe payment handlers in services/payments/…\").",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
+      "rule": "model_fit.opus_on_generic_role",
+      "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "model",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-missing-tools.md",
+        "line": 4,
+        "value": "opus"
+      },
+      "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
       "source": "https://code.claude.com/docs/en/sub-agents"
     },
     {

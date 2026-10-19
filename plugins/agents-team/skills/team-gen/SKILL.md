@@ -117,6 +117,8 @@ Every agent value must be filled — descriptions in third person, `use when`/`u
 python3 plugins/agents-team/lib/gen/scaffold.py <team.json> --target <project-dir>
 ```
 
+On Windows, `python3` is often the Microsoft Store alias and does nothing. Use the first that works: `python3 -c 1`, then `python`, then `py -3`.
+
 This:
 - Creates `<target>/.claude/{agents,skills,rules,hooks}`.
 - Renders archetype templates with each agent's values.
