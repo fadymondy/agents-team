@@ -3,8 +3,8 @@
   "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/c-helper.md",
   "kind": "agent",
   "overall": {
-    "score": 92,
-    "grade": "A",
+    "score": 88,
+    "grade": "B",
     "verdict": "ship"
   },
   "dimensions": {
@@ -14,13 +14,13 @@
       "findings": []
     },
     "description": {
-      "score": 80,
+      "score": 70,
       "weight": 0.25,
       "findings": [
         {
           "severity": "warning",
           "rule": "description.length_outside_band",
-          "message": "Agent description length 73 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+          "message": "Agent description length 73 chars is outside the 80–400 band. Too short → ambiguous routing; too long → wastes routing context.",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "description",
@@ -32,7 +32,7 @@
           "source": "https://code.claude.com/docs/en/sub-agents"
         },
         {
-          "severity": "suggestion",
+          "severity": "warning",
           "rule": "description.no_use_when_trigger",
           "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
           "produced_by": "static",
@@ -66,9 +66,24 @@
       ]
     },
     "model_fit": {
-      "score": 100,
+      "score": 85,
       "weight": 0.1,
-      "findings": []
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "model_fit.opus_on_generic_role",
+          "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "model",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/c-helper.md",
+            "line": 4,
+            "value": "opus"
+          },
+          "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
     },
     "body_structure": {
       "score": 90,
@@ -110,7 +125,7 @@
     {
       "severity": "warning",
       "rule": "description.length_outside_band",
-      "message": "Agent description length 73 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+      "message": "Agent description length 73 chars is outside the 80–400 band. Too short → ambiguous routing; too long → wastes routing context.",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "description",
@@ -122,7 +137,7 @@
       "source": "https://code.claude.com/docs/en/sub-agents"
     },
     {
-      "severity": "suggestion",
+      "severity": "warning",
       "rule": "description.no_use_when_trigger",
       "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
       "produced_by": "static",
@@ -132,6 +147,20 @@
         "line": 3
       },
       "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
+      "rule": "model_fit.opus_on_generic_role",
+      "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "model",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/c-helper.md",
+        "line": 4,
+        "value": "opus"
+      },
+      "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
       "source": "https://code.claude.com/docs/en/sub-agents"
     },
     {

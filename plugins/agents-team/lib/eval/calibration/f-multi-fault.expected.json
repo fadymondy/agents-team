@@ -3,7 +3,7 @@
   "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
   "kind": "agent",
   "overall": {
-    "score": 70,
+    "score": 66,
     "grade": "C",
     "verdict": "reject"
   },
@@ -43,13 +43,13 @@
       ]
     },
     "description": {
-      "score": 65,
+      "score": 55,
       "weight": 0.25,
       "findings": [
         {
           "severity": "warning",
           "rule": "description.length_outside_band",
-          "message": "Agent description length 6 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+          "message": "Agent description length 6 chars is outside the 80–400 band. Too short → ambiguous routing; too long → wastes routing context.",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "description",
@@ -63,7 +63,7 @@
         {
           "severity": "warning",
           "rule": "description.first_or_second_person",
-          "message": "Description uses first/second person (e.g. \"I help\u2026\", \"you can use\u2026\"). Anthropic guidance: write descriptions in third person.",
+          "message": "Description uses first/second person (e.g. \"I help…\", \"you can use…\"). Anthropic guidance: write descriptions in third person.",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "description",
@@ -71,11 +71,11 @@
             "line": 3,
             "value": "I help"
           },
-          "fix": "Rewrite in third person (\"Reviews code for\u2026\" not \"I review code for\u2026\").",
+          "fix": "Rewrite in third person (\"Reviews code for…\" not \"I review code for…\").",
           "source": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
         },
         {
-          "severity": "suggestion",
+          "severity": "warning",
           "rule": "description.no_use_when_trigger",
           "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
           "produced_by": "static",
@@ -96,7 +96,7 @@
         {
           "severity": "critical",
           "rule": "tool_hygiene.tools_omitted",
-          "message": "`tools` is not set \u2014 the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
+          "message": "`tools` is not set — the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "tools"
@@ -107,9 +107,24 @@
       ]
     },
     "model_fit": {
-      "score": 100,
+      "score": 85,
       "weight": 0.1,
-      "findings": []
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "model_fit.opus_on_generic_role",
+          "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "model",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
+            "line": 4,
+            "value": "claude-3-opus-20240229"
+          },
+          "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
     },
     "body_structure": {
       "score": 90,
@@ -148,7 +163,7 @@
         {
           "severity": "warning",
           "rule": "anti_patterns.injection_system_tag",
-          "message": "Body contains a `<system>` tag \u2014 possible prompt-injection vector.",
+          "message": "Body contains a `<system>` tag — possible prompt-injection vector.",
           "produced_by": "static",
           "evidence": {
             "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
@@ -192,7 +207,7 @@
     {
       "severity": "critical",
       "rule": "tool_hygiene.tools_omitted",
-      "message": "`tools` is not set \u2014 the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
+      "message": "`tools` is not set — the agent silently inherits every tool from the parent (the most common over-grant anti-pattern).",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "tools"
@@ -217,7 +232,7 @@
     {
       "severity": "warning",
       "rule": "description.length_outside_band",
-      "message": "Agent description length 6 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+      "message": "Agent description length 6 chars is outside the 80–400 band. Too short → ambiguous routing; too long → wastes routing context.",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "description",
@@ -231,7 +246,7 @@
     {
       "severity": "warning",
       "rule": "description.first_or_second_person",
-      "message": "Description uses first/second person (e.g. \"I help\u2026\", \"you can use\u2026\"). Anthropic guidance: write descriptions in third person.",
+      "message": "Description uses first/second person (e.g. \"I help…\", \"you can use…\"). Anthropic guidance: write descriptions in third person.",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "description",
@@ -239,13 +254,40 @@
         "line": 3,
         "value": "I help"
       },
-      "fix": "Rewrite in third person (\"Reviews code for\u2026\" not \"I review code for\u2026\").",
+      "fix": "Rewrite in third person (\"Reviews code for…\" not \"I review code for…\").",
       "source": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
     },
     {
       "severity": "warning",
+      "rule": "description.no_use_when_trigger",
+      "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "description",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
+        "line": 3
+      },
+      "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
+      "rule": "model_fit.opus_on_generic_role",
+      "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "model",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
+        "line": 4,
+        "value": "claude-3-opus-20240229"
+      },
+      "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
       "rule": "anti_patterns.injection_system_tag",
-      "message": "Body contains a `<system>` tag \u2014 possible prompt-injection vector.",
+      "message": "Body contains a `<system>` tag — possible prompt-injection vector.",
       "produced_by": "static",
       "evidence": {
         "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
@@ -266,19 +308,6 @@
         "match": "ignore prior instructions"
       },
       "fix": "Remove or rephrase. Constraints belong in the `## Constraints` section, not as override directives.",
-      "source": "https://code.claude.com/docs/en/sub-agents"
-    },
-    {
-      "severity": "suggestion",
-      "rule": "description.no_use_when_trigger",
-      "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
-      "produced_by": "static",
-      "evidence": {
-        "frontmatter_field": "description",
-        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/f-multi-fault.md",
-        "line": 3
-      },
-      "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
       "source": "https://code.claude.com/docs/en/sub-agents"
     },
     {

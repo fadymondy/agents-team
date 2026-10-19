@@ -3,7 +3,7 @@
   "path": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
   "kind": "agent",
   "overall": {
-    "score": 89,
+    "score": 85,
     "grade": "B",
     "verdict": "ship"
   },
@@ -14,13 +14,13 @@
       "findings": []
     },
     "description": {
-      "score": 65,
+      "score": 55,
       "weight": 0.25,
       "findings": [
         {
           "severity": "warning",
           "rule": "description.length_outside_band",
-          "message": "Agent description length 16 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+          "message": "Agent description length 16 chars is outside the 80–400 band. Too short → ambiguous routing; too long → wastes routing context.",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "description",
@@ -34,7 +34,7 @@
         {
           "severity": "warning",
           "rule": "description.first_or_second_person",
-          "message": "Description uses first/second person (e.g. \"I help\u2026\", \"you can use\u2026\"). Anthropic guidance: write descriptions in third person.",
+          "message": "Description uses first/second person (e.g. \"I help…\", \"you can use…\"). Anthropic guidance: write descriptions in third person.",
           "produced_by": "static",
           "evidence": {
             "frontmatter_field": "description",
@@ -42,11 +42,11 @@
             "line": 3,
             "value": "I help"
           },
-          "fix": "Rewrite in third person (\"Reviews code for\u2026\" not \"I review code for\u2026\").",
+          "fix": "Rewrite in third person (\"Reviews code for…\" not \"I review code for…\").",
           "source": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
         },
         {
-          "severity": "suggestion",
+          "severity": "warning",
           "rule": "description.no_use_when_trigger",
           "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
           "produced_by": "static",
@@ -66,9 +66,24 @@
       "findings": []
     },
     "model_fit": {
-      "score": 100,
+      "score": 85,
       "weight": 0.1,
-      "findings": []
+      "findings": [
+        {
+          "severity": "warning",
+          "rule": "model_fit.opus_on_generic_role",
+          "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+          "produced_by": "static",
+          "evidence": {
+            "frontmatter_field": "model",
+            "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+            "line": 4,
+            "value": "opus"
+          },
+          "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
+          "source": "https://code.claude.com/docs/en/sub-agents"
+        }
+      ]
     },
     "body_structure": {
       "score": 90,
@@ -110,7 +125,7 @@
     {
       "severity": "warning",
       "rule": "description.length_outside_band",
-      "message": "Agent description length 16 chars is outside the 80\u2013400 band. Too short \u2192 ambiguous routing; too long \u2192 wastes routing context.",
+      "message": "Agent description length 16 chars is outside the 80–400 band. Too short → ambiguous routing; too long → wastes routing context.",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "description",
@@ -124,7 +139,7 @@
     {
       "severity": "warning",
       "rule": "description.first_or_second_person",
-      "message": "Description uses first/second person (e.g. \"I help\u2026\", \"you can use\u2026\"). Anthropic guidance: write descriptions in third person.",
+      "message": "Description uses first/second person (e.g. \"I help…\", \"you can use…\"). Anthropic guidance: write descriptions in third person.",
       "produced_by": "static",
       "evidence": {
         "frontmatter_field": "description",
@@ -132,11 +147,11 @@
         "line": 3,
         "value": "I help"
       },
-      "fix": "Rewrite in third person (\"Reviews code for\u2026\" not \"I review code for\u2026\").",
+      "fix": "Rewrite in third person (\"Reviews code for…\" not \"I review code for…\").",
       "source": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
     },
     {
-      "severity": "suggestion",
+      "severity": "warning",
       "rule": "description.no_use_when_trigger",
       "message": "Description does not contain a \"use when\" / \"use proactively\" / \"MUST BE USED\" trigger phrase, so the orchestrator may under-delegate.",
       "produced_by": "static",
@@ -146,6 +161,20 @@
         "line": 3
       },
       "fix": "Add e.g. \"Use immediately after writing or modifying code.\"",
+      "source": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "severity": "warning",
+      "rule": "model_fit.opus_on_generic_role",
+      "message": "Uses Opus but the description names no specific domain or hard-reasoning task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work.",
+      "produced_by": "static",
+      "evidence": {
+        "frontmatter_field": "model",
+        "file": "/Users/fadymondy/Sites/agents-team/plugins/agents-team/lib/eval/calibration/d-vague-description.md",
+        "line": 4,
+        "value": "opus"
+      },
+      "fix": "Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
       "source": "https://code.claude.com/docs/en/sub-agents"
     },
     {
