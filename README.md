@@ -8,6 +8,8 @@ Three pillars:
 - **`/meet`** — streamed multi-agent meeting on a topic with structured minutes. ([docs](docs/meet.md))
 - **`/evaluate-agent`** — score any agent (or skill) against a citation-backed rubric. Static linter ships now; LLM-as-judge and behavioral harness layer on top. ([docs](docs/evaluator.md))
 
+Read the launch article: [Claude Code agent team generator](https://agents-team.fadymondy.com/en/blog/claude-code-agent-team-generator), and [why I built it](https://fadymondy.com/en/blog/why-i-built-claude-agents-team).
+
 ## Install
 
 ```bash
