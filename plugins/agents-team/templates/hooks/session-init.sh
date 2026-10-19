@@ -8,7 +8,7 @@
 
 set -u
 
-cd "${CLAUDE_PROJECT_DIR:-.}"
+cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
 
 TEAM_NAME="{{TEAM_NAME}}"
 

@@ -146,6 +146,7 @@ def materialize(team_spec: dict, target_root: Path, dry_run: bool = False) -> di
         if partial_path.exists():
             partial = json.loads(_read(partial_path))
             partial.pop("_comment", None)
+            partial["hooks"] = _select_hooks(partial.get("hooks", {}), team_spec.get("hooks", []))
             settings_path = claude_dir / "settings.json"
             existing: dict = {}
             if settings_path.exists():
@@ -164,11 +165,30 @@ def materialize(team_spec: dict, target_root: Path, dry_run: bool = False) -> di
     return manifest
 
 
+def _select_hooks(events: dict, hook_ids: list[str]) -> dict:
+    """Keep only matcher groups whose commands run a hook script the team
+    actually ships, so settings.json never points at a missing file."""
+    wanted = {f"/.claude/hooks/{h}.sh" for h in hook_ids}
+    out: dict = {}
+    for event, groups in events.items():
+        kept = [
+            g for g in groups
+            if any(any(w in str(h.get("command", "")) for w in wanted) for h in g.get("hooks", []))
+        ]
+        if kept:
+            out[event] = kept
+    return out
+
+
 def _merge_dict(a: dict, b: dict) -> dict:
     out = dict(a)
     for k, v in b.items():
         if k in out and isinstance(out[k], dict) and isinstance(v, dict):
             out[k] = _merge_dict(out[k], v)
+        elif k in out and isinstance(out[k], list) and isinstance(v, list):
+            # Hook event lists: keep the user's existing groups, append ours
+            # once (re-running the scaffolder must not duplicate them).
+            out[k] = out[k] + [x for x in v if x not in out[k]]
         else:
             out[k] = v
     return out
