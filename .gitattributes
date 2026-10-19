@@ -1,0 +1,7 @@
+# Shell scripts and hook templates must keep LF endings, or bash on Windows
+# (Git Bash / MSYS) fails with `$'\r': command not found` after a CRLF checkout.
+* text=auto
+*.sh text eol=lf
+*.partial text eol=lf
+*.template text eol=lf
+*.py text eol=lf

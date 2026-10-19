@@ -76,8 +76,18 @@ WRITE_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit"}
 ORCHESTRATOR_INDICATORS = ("orchestrator", "orchestrate", "delegate", "route")
 REVIEW_INDICATORS = ("review", "audit", "analyze", "report", "linter", "evaluator", "monitor")
 VAGUE_VERBS_ALONE = re.compile(
-    r"^\s*(helps?|assists?|supports?)\b[^.]{0,40}$", re.IGNORECASE
+    r"^\s*(helps?|assists?|supports?|handles?|does)\b[^.]{0,40}\.?\s*$", re.IGNORECASE
 )
+# Filler nouns that say nothing about the agent's domain ("Helps with stuff.").
+GENERIC_SCOPE_WORDS = re.compile(
+    r"\b(stuff|things|anything|everything|whatever|various|misc|miscellaneous|"
+    r"general\s+tasks?|all\s+tasks|any\s+tasks?)\b",
+    re.IGNORECASE,
+)
+# Below this length a description cannot carry both WHAT and WHEN.
+SHORT_DESCRIPTION_CHARS = 80
+# `tools` values that grant every tool — same over-grant as omitting `tools`.
+UNRESTRICTED_TOOL_VALUES = {"*", "all", "any"}
 FIRST_OR_SECOND_PERSON = re.compile(
     r"\b(I\s+(can|will|help)|my\s+job|let\s+me|you\s+can\s+use\s+(this|me)|use\s+me\b)",
     re.IGNORECASE,
@@ -105,6 +115,9 @@ class Finding:
     fix: Optional[str] = None
     source: Optional[str] = None
     produced_by: str = "static"
+    # Score deduction override for findings that should sink their whole
+    # dimension without escalating the verdict to reject (internal only).
+    penalty: Optional[int] = None
 
     def to_dict(self) -> dict[str, Any]:
         d = {
@@ -407,8 +420,11 @@ def desc_use_when_trigger(pf: ParsedFile, kind: str):
         return
     desc_str = str(desc)
     if not USE_WHEN_TRIGGER.search(desc_str):
+        # A long, specific description without a trigger phrase still routes
+        # reasonably; a short one has nothing else to route on.
+        short = len(desc_str.strip()) < SHORT_DESCRIPTION_CHARS
         yield Finding(
-            severity="suggestion",
+            severity="warning" if short else "suggestion",
             rule="description.no_use_when_trigger",
             message=(
                 'Description does not contain a "use when" / "use proactively" / '
@@ -440,6 +456,44 @@ def desc_no_vague_verb_only(pf: ParsedFile, kind: str):
         )
 
 
+@rule("description")
+def desc_generic_scope(pf: ParsedFile, kind: str):
+    desc = pf.frontmatter.get("description")
+    if not desc:
+        return
+    desc_str = str(desc).strip()
+    m = GENERIC_SCOPE_WORDS.search(desc_str)
+    if m:
+        yield Finding(
+            severity="warning",
+            rule="description.generic_scope",
+            message=(
+                f'Description scopes the role with a filler word ("{m.group(0)}") '
+                "instead of a domain, so the orchestrator cannot tell when to route here."
+            ),
+            evidence=fm_evidence(pf, "description", desc_str),
+            fix='Name the domain and the artifacts it owns ("Owns the Stripe payment handlers in services/payments/…").',
+            source=ANTHROPIC_SUBAGENTS,
+        )
+
+
+def _is_generic_description(desc: str) -> bool:
+    """Short, vague, or filler-scoped descriptions — no real domain signal."""
+    d = desc.strip()
+    return (
+        len(d) < SHORT_DESCRIPTION_CHARS
+        or bool(VAGUE_VERBS_ALONE.match(d))
+        or bool(GENERIC_SCOPE_WORDS.search(d))
+    )
+
+
+def _tools_list(pf: ParsedFile, key: str = "tools") -> list[str]:
+    tools = pf.frontmatter.get(key) or []
+    if isinstance(tools, str):
+        tools = [t.strip() for t in tools.split(",") if t.strip()]
+    return [str(t) for t in tools]
+
+
 # --------------------------------------------------------------------------- #
 # Rules: tool_hygiene
 # --------------------------------------------------------------------------- #
@@ -457,6 +511,28 @@ def tools_field_present(pf: ParsedFile, kind: str):
             evidence={"frontmatter_field": tools_key},
             fix=f"Add an explicit `{tools_key}:` list, even if it is the full set you actually need.",
             source=ANTHROPIC_SUBAGENTS,
+        )
+
+
+@rule("tool_hygiene")
+def tools_unrestricted_wildcard(pf: ParsedFile, kind: str):
+    tools_key = "tools" if kind == "agent" else "allowed-tools"
+    if tools_key not in pf.frontmatter:
+        return  # tools_field_present already covers the omitted case
+    tools = _tools_list(pf, tools_key)
+    wildcard = [t for t in tools if t.strip().lower() in UNRESTRICTED_TOOL_VALUES]
+    if wildcard:
+        yield Finding(
+            severity="warning",
+            rule="tool_hygiene.unrestricted_tools",
+            message=(
+                f"`{tools_key}: {wildcard[0]}` grants every tool, including write, "
+                "shell, and MCP tools — the same over-grant as omitting the field."
+            ),
+            evidence=fm_evidence(pf, tools_key, pf.frontmatter.get(tools_key)),
+            fix=f"Replace `{wildcard[0]}` with the explicit list of tools the role needs.",
+            source=ANTHROPIC_SUBAGENTS,
+            penalty=100,
         )
 
 
@@ -589,6 +665,20 @@ def model_fit_role(pf: ParsedFile, kind: str):
             ),
             evidence=fm_evidence(pf, "model", model),
             fix="Switch to Haiku (cheap, fast) unless the role does multi-step reasoning.",
+            source=ANTHROPIC_SUBAGENTS,
+        )
+    if "opus" in model and not is_readonly and not is_architect and _is_generic_description(
+        str(pf.frontmatter.get("description", ""))
+    ):
+        yield Finding(
+            severity="warning",
+            rule="model_fit.opus_on_generic_role",
+            message=(
+                "Uses Opus but the description names no specific domain or hard-reasoning "
+                "task. Anthropic guidance: Opus for hard reasoning; Sonnet for most code work."
+            ),
+            evidence=fm_evidence(pf, "model", model),
+            fix="Use Sonnet (or Haiku for lookups), or describe the reasoning-heavy work that needs Opus.",
             source=ANTHROPIC_SUBAGENTS,
         )
     if "haiku" in model and is_architect:
@@ -821,7 +911,7 @@ _SEVERITY_PENALTY = {"critical": 40, "warning": 15, "suggestion": 5}
 def score_for(findings: list[Finding]) -> int:
     score = 100
     for f in findings:
-        score -= _SEVERITY_PENALTY.get(f.severity, 5)
+        score -= f.penalty if f.penalty is not None else _SEVERITY_PENALTY.get(f.severity, 5)
     return max(0, min(100, score))
 
 
